@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>dewsdwsd</title>
+    <style>
+    .chatbot-container {
+      border: 1px solid #E0FFFF;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      max-width: 450px;
+      margin: 0 auto;
+    }
+
+    .chatbot-header {
+      background-color: #DA70D6;
+      color: white;
+      padding: 10px;
+      border-top-left-radius: 200px;
+      border-top-right-radius: 200px;
+    }
+
+    .chatbot-dialogue {
+      height: 450px;
+      overflow-y: scroll;
+      padding: 1px;
+    }
+
+    .chatbot-message {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .chatbot-message p {
+      margin: 0;
+      padding: 8px;
+      border-radius: 50px;
+    }
+
+    .received {
+      background-color: #ADFF2F;
+    }
+
+    .sent {
+      background-color: #F0E683;
+      color: white;
+    }
+
+    .chatbot-message img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 500px;
+      margin-right: 10px;
+    }
+
+    .chatbot-message .message-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chatbot-message .message-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: auto;
+    }
+
+    .chatbot-message .message-info span {
+      font-size: 20px;
+      color: #aaa;
+    }
+
+    .chatbot-message .message-info .message-time {
+      font-size: 15px;
+    }
+
+    .chatbot-input {
+      display: flex;
+      padding: 10px;
+      justify-content: space-between;
+    }
+
+    .chatbot-input input[type="text"] {
+      flex: 1;
+      margin-right: 1px;
+      padding: 1px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    .chatbot-input button {
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+      background-color: #FF7F50;
+      color: 111;
+      cursor: pointer;
+    }
+    </style>
+    <style>
+      #center {
+        text-align: center;
+        margin-top: 110px;
+        font-size: 20px;
+        color: #111;
+        background: #1111;
+      }
+    </style>
+    <!--وسط نسخه یک-->
+    <style>
+      #center-1 {
+        text-align: center;
+        margin-top: 110px;
+        font-size: 40px;
+        color: #FA8072;
+        background: #1111;
+      }
+    </style>
+  <!--راست-->
+  <style>
+    #right {
+      text-align: right;
+      margin-top: 110px;
+      font-size: 40px;
+      color: #FA8072;
+      background: #1111;
+    }
+</style>
+  <!--چپ-->
+  <style>
+    #left {
+      text-align: left;
+      margin-top: 110px;
+      font-size: 20px;
+      color: #FA8072;
+      background: #1111;
+    }
+</style>
+<style>
+#map {
+  height: 400px;
+  margin-bottom: 20px;
+}
+
+.location-icon {
+  position: absolute;
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f44336;
+  color: #ffffff;
+  text-align: center;
+  line-height: 40px;
+  font-size: 24px;
+}
+</style>
+  </head>
+  <body>
+  <div id="center">
+    <div class="chatbot-container">
+      <div class="chatbot-header">
+        <h3>پرکار ربات پاسخگویی به سوالات شما</h3>
+      </div>
+      <div class="chatbot-dialogue">
+        <div class="chatbot-message received">
+          <p>سلام! چطور می‌توانم به شما کمک کنم؟</p>
+        </div>
+      </div>
+      <div class="chatbot-input">
+        <input type="text" placeholder="نوشتن پیام ..." />
+        <input type="file" id="image-input" accept="image/*" style="display:none;" />
+        <button id="text-send-btn">ارسال</button>
+        <h1></h1>
+        <button id="image-send-btn">ارسال عکس</button>
+        <h1></h1>
+        <button id="recording-btn">ضبط صدا</button>
+      </div>
+    </div>
+  </div>
+
+    <!--wewe-->
+<script>
+const chatbotDialogue = document.querySelector('.chatbot-dialogue');
+const chatbotTextInput = document.querySelector('.chatbot-input input[type="text"]');
+const textSendBtn = document.querySelector('#text-send-btn');
+
+function sendMessage(message, sender) {
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('chatbot-message', sender);
+
+  const messageContent = document.createElement('div');
+  messageContent.classList.add('message-content');
+
+  const messageInfo = document.createElement('div');
+  messageInfo.classList.add('message-info');
+  const senderName = sender === 'sent' ? 'شما' : 'ربات چت';
+  messageInfo.innerHTML = `<span>${senderName}</span><span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+
+  const messageText = document.createElement('p');
+  messageText.textContent = message;
+
+  messageContent.appendChild(messageInfo);
+  messageContent.appendChild(messageText);
+  messageDiv.appendChild(messageContent);
+  chatbotDialogue.appendChild(messageDiv);
+  chatbotDialogue.scrollTop = chatbotDialogue.scrollHeight;
+
+  // Check if the message is a question and send a response accordingly
+  if (sender === 'received' && message.endsWith('?')) {
+    sendResponse('متاسفانه من نمی‌توانم به این سوال پاسخ دهم.');
+  } else if (sender === 'received') {
+    sendResponse('ممنون! به چه طریقی می‌توانم به شما کمک کنم؟');
+  }
+}
+
+function sendResponse(message) {
+  setTimeout(() => {
+    sendMessage(message, 'sent');
+  }, 500);
+}
+
+textSendBtn.addEventListener('click', () => {
+  const message = chatbotTextInput.value;
+  if (message.trim() !== '') {
+    sendMessage(message, 'sent');
+    chatbotTextInput.value = '';
+    sendResponse('در حال پردازش...');
+  }
+});
+
+chatbotTextInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    const message = chatbotTextInput.value;
+    if (message.trim() !== '') {
+      sendMessage(message, 'sent');
+      chatbotTextInput.value = 'صیی';
+      sendResponse('سلام دوست عزیز چطوری خوبی');
+    }
+  }
+});
+
+// Start the conversation with a greeting message
+sendResponse('سلام! من ربات چت هستم. چطور می‌توانم به شما کمک کنم؟');
+</script>
+
+  </body>
+</html>
